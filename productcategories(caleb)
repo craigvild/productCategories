@@ -1,0 +1,13 @@
+
+//Categories JS from Caleb
+
+// for console testing, doesn't hurt anything if it goes live
+var b = b || utag.data || {};
+
+var productCategoryIsMissing = (!b.product_category || b.product_categpry === "" || !b.product_category.length || b.product_category.length === 0);
+var productSkuIsPopulated = (b.product_sku && b.product_sku.length && b.product_sku.length > 0);
+
+// only touch product_category if it's undefined or an empty array and we have a product_id array to use
+if (productCategoryIsMissing && productSkuIsPopulated) {
+    b.product_category = generateProductCategoryFromProductSku(b.product_sku);
+}
