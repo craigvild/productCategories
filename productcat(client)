@@ -1,0 +1,25 @@
+// relies on the skus starting with a predictable letter, seems reliable
+function generateProductCategoryFromProductSku (skuArray) {
+    if (!skuArray) return undefined;
+    var categoryArray = [];
+    if (skuArray.length && skuArray.length > 0) {
+        for (var i = 0, category, sku; i < skuArray.length; i++) {
+            category = ''; // fallback to empty string placeholder in array
+            sku = skuArray[i];
+            if (stringStartsWith(sku, 'm')) category = "Menswear";
+            if (stringStartsWith(sku, 'w')) category = "Womenswear";
+            if (stringStartsWith(sku, 'a')) category = "Accessories";
+            categoryArray.push(category);
+        }
+    }
+    return categoryArray;
+}
+
+// returns a boolean, is NOT case-sensitive
+function stringStartsWith(string, prefix) {
+    if (!string || !prefix) return undefined;
+    var reString = '^' + prefix + '.*';
+    var re = new RegExp(reString, 'i');
+    if (re.test(string)) return true;
+    return false;
+}
