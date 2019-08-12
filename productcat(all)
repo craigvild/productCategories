@@ -111,3 +111,133 @@ b.menswear_total = currentMensTotal;
 console.log(b.menswear_total);
 console.log(b.womenswear_total);
 
+
+// More JS for categories:
+
+(function() {
+    if (utag.data.product_sku !== 'undefined' && utag.data.product_sku.length > 0) {
+        
+        function setProductCategories() {
+            // unlikely - but if the product_category is not in the DL then initiate it
+            if (utag.data.product_category === 'undefined') {
+                utag.data.product_category = [];
+            }
+                
+            for (i=0; i<utag.data.product_sku.length; i++) {
+                var sku = utag.data.product_sku[i].toLowerCase(),
+                    firstLetter = sku.substring(0,1),
+                    category = null;
+                
+                switch (firstLetter) {
+                    case 'w':
+                        category = 'womens';
+                        break;
+                    case 'm':
+                        category = 'mens';
+                        break;
+                    case 'a':
+                        category = 'accessories';
+                        break;
+                    case 'h':
+                        category = 'home';
+                        break;
+                }
+                
+                // add category to DL with same index as sku
+                utag.data.product_category[i] = category;
+            }
+        }
+
+        function setCategoryTotals() {
+            var categoryArray = [];
+
+            // construct associative array for ease of distinction
+            for (i=0; i<utag.data.product_category.length; i++) {
+                var category = utag.data.product_category[i];
+                utag.data.category_names = [];
+                utag.data.category_totals = [];
+
+                if (category !== 'undefined') {
+                    price = parseFloat(utag.data.product_price[i]),
+                    quantity = parseInt(utag.data.product_quantity[i]),
+                    productTotal = price*quantity.toFixed(2),
+                    totalPrice = (category in categoryArray) ? parseFloat(categoryArray[category]) : 0;
+                    categoryArray[category] = parseFloat(totalPrice + productTotal);
+                }
+            }
+
+            // add categories and totals to DL
+            for (var key in categoryArray) {
+                if (categoryArray.hasOwnProperty(key)) {
+                    utag.data.category_names.push(key);
+                    utag.data.category_totals.push(categoryArray[key].toString());
+                }
+            }
+        }
+
+        setProductCategories();
+        setCategoryTotals();
+    }
+})();
+
+
+/* Mens/womens categories. After he’s indexed the gender of the product with another variable based on product_sku value
+
+// Here we set all the data layer variables we need to perform calculation of category ltv. */
+
+// Variables set:
+// product_category_order_totals
+// product_final_cost
+// product_category
+
+
+
+
+//cat values
+var general_categories = [];
+if(b['product_sku']){
+    b['product_sku'].forEach(function (item){
+        general_categories.push(item.charAt(0));
+    });
+}
+utag_data.product_category = general_categories;
+
+//final cost
+var final_cost = [];
+if(b['product_unit_price'] && b['product_quantity']){
+    utag.data.product_unit_price.forEach(function(item, index){
+      var price = parseFloat(item),
+          quantity = parseInt(utag.data.product_quantity[index]);
+        final_cost.push(price * quantity);
+
+    })
+}
+
+//cat order totals
+var mIndex = 0, 
+wIndex = 1,
+aIndex = 2,
+hIndex = 3;
+var catTotals = [0,0,0,0];
+b['product_category'].forEach(function(cat, index){
+    switch(cat){
+        case "m":
+            catTotals[mIndex] += final_cost[index];
+        break;
+        case "w":
+            catTotals[wIndex] += final_cost[index];
+        break;
+        case "a":
+            catTotals[aIndex] += final_cost[index];
+        break;
+        case "h":
+            catTotals[hIndex] += final_cost[index];
+        break;
+    }
+});
+console.log(catTotals, final_cost);
+
+
+utag_data.product_category_order_totals = catTotals;
+
+
