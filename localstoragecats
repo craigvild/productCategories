@@ -1,0 +1,23 @@
+// Type your JavaScript code here...
+
+if (b.page_type == "product" && b.product_id.length==1 && b.product_category.length==1){
+    var categories = JSON.parse(localStorage.getItem("categories")) || {};
+    categories[b.product_id[0]] = b.product_category[0];
+    localStorage.setItem("categories", JSON.stringify(categories));
+}
+
+if (b.page_name == "cart success") {
+    var categories = JSON.parse(localStorage.getItem("categories"));
+    
+    b.total_purchase_men = 0;
+    b.total_purchase_women = 0;
+    
+    for (var i = 0; i < b.product_id.length; i++) {
+        var product_id = b.product_id[i];
+        if (categories[product_id] == "Men") {
+             b.total_purchase_men += Number(b.product_unit_price[i]) || 0;
+        } else if (categories[product_id] == "Women") {
+            b.total_purchase_women += Number(b.product_unit_price[i]) || 0;
+        }
+    }
+}
